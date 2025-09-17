@@ -1,7 +1,7 @@
 # SL Traffic Status Lovelace Card
 Present traffic status from HASL Combination sensors.
 
-![card](https://user-images.githubusercontent.com/1217994/57677754-e1773980-7627-11e9-81e7-4b991a6e4dc1.png)
+![card](/assets/card.png)
 
 ## Manual Installation
 Copy [`hasl-traffic-status-card.js`](https://github.com/hasl-platform/lovelace-hasl-traffic-status-card/blob/master/dist/hasl-traffic-status-card.js) to `<config>/www/hasl-traffic-status-card.js`
