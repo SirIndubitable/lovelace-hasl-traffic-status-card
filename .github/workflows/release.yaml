@@ -1,0 +1,31 @@
+name: 'Build & Publish'
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the file
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload js to release
+        uses: svenstaro/upload-release-action@2.9.0
+
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/weekly-calendar-card.*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true

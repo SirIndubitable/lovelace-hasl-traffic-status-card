@@ -1,0 +1,28 @@
+name: 'Validate Build'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    name: Test build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install --only=dev
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
