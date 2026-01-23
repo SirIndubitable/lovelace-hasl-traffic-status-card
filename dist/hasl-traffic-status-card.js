@@ -1,30 +1,31 @@
 const lang = {
   'sv-SE': {
-    entity_missing: 'Ingen data hittades', bus: 'Buss',
-    metro: 'Tunnelbana',
+    entity_missing: 'Ingen data hittades',
+    BUS: 'Buss',
+    METRO: 'Tunnelbana',
     light_railway: 'Lokalbana',
-    commuter_train: 'Pendeltåg',
-    tram: 'Spårvagn',
-    ferry: 'Båt'
+    TRAIN: 'Pendeltåg',
+    TRAM: 'Spårvagn',
+    FERRY: 'Båt'
   },
   'en-EN': {
     entity_missing: 'Entity data missing',
-    bus: 'Bus',
-    metro: 'Subway',
+    BUS: 'Bus',
+    METRO: 'Subway',
     light_railway: 'Light Railway',
-    commuter_train: 'Commuter Train',
-    tram: 'Tram',
-    ferry: 'Ferry'
+    TRAIN: 'Commuter Train',
+    TRAM: 'Tram',
+    FERRY: 'Ferry'
   },
   'fr-FR': {
     entity_missing: 'Aucune info trouv&eacute;e',
-    bus: 'Bus',
-    metro: 'M&eacute;tro',
+    BUS: 'Bus',
+    METRO: 'M&eacute;tro',
     light_railway: 'Train local',
-    commuter_train: 'Train r&eacute;gional',
-    tram: 'Trammay',
-    ferry: 'Bateau'
-  }   
+    TRAIN: 'Train r&eacute;gional',
+    TRAM: 'Trammay',
+    FERRY: 'Bateau'
+  }
 }
 
 class HASLTrafficStatusCard extends HTMLElement {
@@ -117,7 +118,7 @@ class HASLTrafficStatusCard extends HTMLElement {
             border-radius: 2px;
             background: #0089ca;
             padding: 3px 3px 0 3px;
-            margin-bottom: 3px;
+            margin: 0 3px 3px 3px;
             color: #fff;
             min-width: 22px;
             height: 22px;
@@ -128,35 +129,60 @@ class HASLTrafficStatusCard extends HTMLElement {
           }
 
           /* Metros */
-          .line-icon.met_green {
-              background-color: #179d4d;
+          .line-icon.bus_blue {
+              background-color: rgba(38, 122, 190, 1);
           }
 
           /* Buses and Metro Red Line */
-          .line-icon.bus_red, .line-icon.met_red {
-              background-color: #d71d24;
+          .line-icon.bus_red {
+              background-color: rgba(200, 24, 30, 1);
+          }
+
+          .line-icon.met_blue {
+              background-color: rgba(7, 164, 238, 1);
+          }
+
+          .line-icon.met_green {
+              background-color: rgba(33, 178, 89, 1);
+          }
+
+          /* Buses and Metro Red Line */
+          .line-icon.met_red {
+              background-color: rgba(228, 31, 38, 1);
           }
 
           /* Commuter Trains */
           .line-icon.trn {
-              background-color: #ec619f;
+              background-color: rgba(241, 102, 167, 1);
           }
 
           /* Trams */
-          .line-icon.trm {
-              background-color: #985141;
+          .line-icon.trm_7 {
+              background-color: rgba(128, 133, 126, 1);
           }
 
-          .line-icon.trm.trm_7 {
-              background-color: #878a83;
+          .line-icon.trm_12 {
+              background-color: rgba(115, 139, 164, 1);
           }
 
-          .line-icon.trm.trm_variant {
-              background-color: #b76020;
+          .line-icon.trm_21 {
+              background-color: rgba(181, 102, 49, 1);
           }
 
-          .line-icon.trm.trm_22 {
-              background-color: #d77d00;
+          .line-icon.trm_25 {
+              background-color: rgba(32, 178, 170, 1);
+          }
+
+          .line-icon.trm_27 {
+              background-color: rgba(160, 94, 166, 1);
+          }
+
+          .line-icon.trm_30 {
+              background-color: rgba(224, 130, 32, 1);
+          }
+
+          .line-icon.ferry {
+              background-color: rgba(6, 145, 211, 1);
           }
 
         </style>
@@ -189,12 +215,14 @@ class HASLTrafficStatusCard extends HTMLElement {
             if (config.name) html += "<div class=\"header\"><div class=\"name\">" + config.name + (config.show_time === true ? ' '  + updated : '') + "</div></div>"
           }
 
-          html += getTableRow('bus', entity_data.attributes, culture);
-          html += getTableRow('metro', entity_data.attributes, culture);
-          html += getTableRow('light_railway', entity_data.attributes, culture);
-          html += getTableRow('commuter_train', entity_data.attributes, culture);
-          html += getTableRow('tram', entity_data.attributes, culture);
-          html += getTableRow('ferry', entity_data.attributes, culture);
+          const trafficStatuses = getTrafficStatus(entity_data.attributes.deviations, culture)
+
+          html += getTableRow('BUS', trafficStatuses, culture);
+          html += getTableRow('METRO', trafficStatuses, culture);
+          html += getTableRow('TRAIN', trafficStatuses, culture);
+          html += getTableRow('TRAM', trafficStatuses, culture);
+          html += getTableRow('FERRY', trafficStatuses, culture);
+
         }
       }
 
@@ -203,104 +231,223 @@ class HASLTrafficStatusCard extends HTMLElement {
 
     this.content.innerHTML = getEntitiesContent(config.entities);
 
-    function getTableRow(trafficType, attributes, culture) {
-      var status = attributes.metro_status;
-      var status_icon = attributes.metro_status_icon;
-      var type_icon = attributes.metro_icon;
-      var events = attributes.metro_events;
-      var iconClass = '';
-
-      switch (trafficType) {
-        case 'bus':
-          status = attributes.bus_status;
-          status_icon = attributes.bus_status_icon;
-          events = attributes.bus_events;
-          type_icon = attributes.bus_icon;
-          iconClass = ' bus_red';
-          break;
-        case 'ferry':
-          status = attributes.ferry_status;
-          status_icon = attributes.ferry_status_icon;
-          events = attributes.ferry_events;
-          type_icon = attributes.ferry_icon;
-          break;
-        case 'tram':
-          status = attributes.tram_status;
-          status_icon = attributes.tram_status_icon;
-          events = attributes.tram_events;
-          type_icon = attributes.tram_icon;
-          iconClass = ' trm';
-          break;
-        case 'commuter_train':
-          status = attributes.train_status;
-          status_icon = attributes.train_status_icon;
-          events = attributes.train_events;
-          type_icon = attributes.train_icon;
-          iconClass = ' trn';
-          break;
-        case 'light_railway':
-          status = attributes.local_status;
-          status_icon = attributes.local_status_icon;
-          events = attributes.local_events;
-          type_icon = attributes.local_icon;
-          iconClass = ' trm trm_21';
-          break;
-      }
+    function getTableRow(trafficType, trafficStatuses, culture) {
+      var status = trafficStatuses[trafficType]
 
       var trafficTypeLang = lang[culture][trafficType];
 
-      var html = '';
-
-      if (typeof status !== 'undefined') {
-        html += "<table class=\"sl-traffic-status-table\">"
-        html += `
-            <tr>
-                <th class="col1"><ha-icon icon="${type_icon}"></ha-icon></th>
-                <th class="col2">${trafficTypeLang}</th>
-                <th class="col3"><ha-icon class="${status.toLowerCase()}" icon="${status_icon}"></ha-icon></td>                    
-            </tr>
-            `
-
-        if (events.length > 0 && config.hide_events !== true) {
-          for (var j = 0; j < events.length; j++) {
-
-            switch (events[j].TrafficLine) {
-              case 'Spårväg City':
-                iconClass = " trm trm_7";
-                break;
-              case 'Tvärbanan':
-                iconClass = " trm trm_22"
-                break;
-              case 'Gröna linjen':
-                iconClass = " met_green"
-                break;
-              case 'Röda linjen':
-                iconClass = " met_red"
-                break;
-            }
-
-            var showEvent = true;
-
-            if(config.show_only_disturbances === true && events[j].Status === "Good")
-            {
-              showEvent = false;
-            }
-
-            if(showEvent)
-            {
-              html += `<tr>`
-                html += `<td class="col1"></td>`
-                html += `<td class="col2">${events[j].TrafficLine !== null ?
-                        `<span class="line-icon${iconClass}"><b>${events[j].TrafficLine}</b></span><br/>` : ''} ${events[j].Message.replace("Övriga linjer:", "<span class=\"line-icon\"><b>Övriga linjer</b></span><br/>").replace("inga större störningar", "Inga större störningar")}</td>` 
-                html += `<td class="col3" valign="top"><ha-icon class="${events[j].Status.toLowerCase()}" icon="${events[j].StatusIcon}"></ha-icon></td>`  
-              html += `</tr>`
-            }
-          }
-        }
-        html += "</table>"
+      if (typeof status === 'undefined') {
+        return '';
+      }
+      if (status.events.length == 0 && config.hide_empty) {
+        return '';
       }
 
+      var html = '';
+      html += "<table class=\"sl-traffic-status-table\">"
+      html += `
+          <tr>
+              <th class="col1"><ha-icon icon="${status.type_icon}"></ha-icon></th>
+              <th class="col2">${trafficTypeLang}</th>
+              <th class="col3"></td>
+          </tr>
+        `
+
+      for (const i in status.events) {
+        const event = status.events[i]
+        event.scope.lines.sort((a, b) => a.id - b.id)
+
+        html += `<tr>`
+        html += `<td class="col1"></td>`
+        html += `<td class="col2">`
+        for (const j in event.scope.lines) {
+          const line = event.scope.lines[j]
+          html += `<span class="line-icon${getLineColor(line)}"><b>${line.id}</b></span>`
+        }
+
+        html += `<br/>`
+        html += event.message_variants[0].header
+
+        html += `</td></tr>`
+      }
+
+      html += "</table>"
+
       return html;
+    }
+
+    function getTrafficStatus(deviations, culture) {
+      const trafficStatus = {
+        'BUS': {
+          type_icon: 'mdi:bus',
+          events: [],
+        },
+        'TRAIN': {
+          type_icon: 'mdi:train',
+          events: [],
+        },
+        'METRO': {
+          type_icon: 'mdi:subway',
+          events: [],
+        },
+        'TRAM': {
+          type_icon: 'mdi:tram',
+          events: [],
+        },
+        'FERRY': {
+          type_icon: 'mdi:ferry',
+          events: [],
+        },
+        'SHIP': {
+          type_icon: 'mdi:ferry',
+          events: [],
+        },
+        'TAXI': {
+          type_icon: 'mdi:taxi',
+          events: [],
+        },
+      }
+
+      for (const i in deviations) {
+        const deviation = deviations[i]
+        const trafficType = deviation.scope.lines[0].transport_mode
+        if (shouldSkipEvent(trafficType, deviation, culture)) {
+          continue;
+        }
+
+        const found = trafficStatus[trafficType].events.find(
+          event => event.message_variants[0].header === deviation.message_variants[0].header);
+        if (typeof found !== 'undefined')
+        {
+          for (const j in deviation.scope.lines)
+          {
+            const line = deviation.scope.lines[j]
+            if (!found.scope.lines.some(l => l.id === line.id))
+            {
+              found.scope.lines.push(line);
+            }
+
+            continue;
+          }
+
+          found.priority.importance_level = Math.max(found.priority.importance_level, deviation.priority.importance_level);
+          continue;
+        }
+
+        trafficStatus[trafficType].events.push(deviation)
+      }
+
+      for (const trafficType in trafficStatus) {
+        trafficStatus[trafficType].events.sort(
+          (a, b) => -(a.priority.importance_level - b.priority.importance_level))
+      }
+
+      return trafficStatus;
+    }
+
+    function shouldSkipEvent(trafficType, event, culture) {
+      if (typeof config.filters === 'undefined') return false;
+
+      if (typeof config.filters.message !== 'undefined') {
+        for (const i in config.filters.message) {
+          const filter = config.filters.message[i];
+          if (event.message_variants[0].header.match(filter)) {
+            return true;
+          }
+        }
+      }
+
+      if (typeof config.filters.traffic_type !== 'undefined') {
+        for (const i in config.filters.traffic_type) {
+          const filter = config.filters.traffic_type[i];
+          if (lang[culture][trafficType].toLowerCase() === filter.toLowerCase()) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    function getLineColor(line) {
+      switch (line.id) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 6:
+          // Blåbusslinje
+          return " bus_blue";
+
+        case 7:
+          // Spårväg City
+          return " trm_7";
+
+        case 10:
+        case 11:
+          // Blå linjen
+          return " met_blue";
+
+        case 12:
+          // Nockebybanan
+          return " trm_12";
+
+        case 13:
+        case 14:
+          // Röda linjen
+          return " met_red";
+
+        case 17:
+        case 18:
+        case 19:
+          // Gröna linjen
+          return " met_green";
+
+        case 21:
+          // Lidingöbanan
+          return " trm_21";
+
+        case 25:
+        case 26:
+          // Saltsjöbanan
+          return " trm_25";
+
+        case 27:
+        case 28:
+        case 29:
+          // Roslagsbanan
+          return " trm_27";
+
+        case 30:
+        case 31:
+          // Tvärbanan
+          return " trm_30";
+
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+        case 44:
+        case 48:
+          // Pendeltåg
+          return " trn";
+      }
+
+      if (line.transport_mode == 'BUS') {
+        // All blue buses that aren't sin have 3 digit line numbers with the middle digit being a 7
+        if (line.id.length == 3 && (line.id / 10) % 10 == 7 ) {
+          // Blåbusslinje
+          return " bus_blue";
+        }
+
+        return " bus_red";
+      }
+
+      if (line.transport_mode == 'FERRY') {
+        return " ferry";
+      }
+
+      return "";
     }
   }
 
@@ -315,6 +462,54 @@ class HASLTrafficStatusCard extends HTMLElement {
   // distribute all cards over the available columns. This kind of works but it is very dynamic
   getCardSize() {
     return this.config.entities.length + 1;
+  }
+
+  static getConfigForm() {
+    return {
+      schema: [
+        { name: "name", selector: { text: {} } },
+        { name: "entities", required: true, selector: { entity: {multiple: true}  } },
+        { name: "language", selector: { text: {} } },
+        { name: "show_time", selector: { boolean: {} } },
+        { name: "hide_empty", selector: { boolean: {} } },
+        { name: "filters", selector: { object: { label_field: 'label', fields:
+          {
+            label: { label: "Label", selector: { text: { }} },
+            traffic_type: { label: "Traffic Type (list)", selector: { object: { multiple: true }} },
+            message: { label: "Message (list)", selector: { object: { multiple: true }} }
+          }}}},
+      ],
+      computeLabel: (schema) => {
+        if (schema.name === "show_time") return "Show Time";
+        if (schema.name === "hide_empty") return "Hide Empty Sections";
+        return undefined;
+      },
+      computeHelper: (schema) => {
+        switch (schema.name) {
+          case "language":
+            return `Language code, e.g. ${Object.keys(lang).join(', ')}. Default is sv-SE.`;
+          case "filters":
+            return `Filters to exclude certain events. Types of filters: 'traffic_type', 'message'.`;
+        }
+        return undefined;
+      },
+      assertConfig: (config) => {
+        if (!config.entities) {
+          throw new Error("'entities' is expected.");
+        }
+        if (config.filters) {
+          if (typeof config.filters !== 'object') throw new Error("'filters' must be in dictionary format.")
+
+          const filterKeys = Object.keys(config.filters);
+          for(const i in filterKeys) {
+            const key = filterKeys[i];
+            if (!Array.isArray(config.filters[key])) {
+              throw new Error(`Unknown filter format for '${key}'. Filters must be a list.`);
+            }
+          }
+        }
+      },
+    };
   }
 }
 

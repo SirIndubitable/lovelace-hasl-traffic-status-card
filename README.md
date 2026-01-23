@@ -7,7 +7,7 @@
 # SL Traffic Status Lovelace Card
 Present traffic status from HASL Combination sensors.
 
-![card](https://user-images.githubusercontent.com/1217994/57677754-e1773980-7627-11e9-81e7-4b991a6e4dc1.png)
+![card](/assets/card.png)
 
 ## Manual Installation
 Copy [`hasl-traffic-status-card.js`](https://github.com/hasl-platform/lovelace-hasl-traffic-status-card/blob/master/dist/hasl-traffic-status-card.js) to `<config>/www/hasl-traffic-status-card.js`
@@ -26,25 +26,30 @@ and use the card through this example:
 ```yaml
 cards:
   - type: custom:hasl-traffic-status-card
-        name: Traffic Status
-        language: en-EN
-        show_time: false
-        hide_events: false
-        show_only_disturbances: false
-        entities:
-          - sensor.traffic_status
+    name: Traffic Status
+    language: sv-SE
+    show_time: false
+    hide_empty: true
+    entities:
+      - sensor.traffic_status
+    filters:
+      traffic_type:
+        - Buss
+      message:
+        - Indragen hållplats
+        - Avstängd hiss
+        - Felaktiga utrop förekommer
+        - Hållplats .* flyttad
 ```
 
 ## Configuration variables
 
-- **name** (*Optional*): If specified it will not render titles per entitiy in the card, but rather have this as the card name. If not speficied it will render each sensors name
-
-- **show_cardname**: Render card name, default `true`
+- **name** (*Optional*): If specified it will not render titles per entity in the card, but rather have this as the card name. If not specified it will render each sensors name
 
 - **language** (*Optional*): The texts will be rendered in this language. Can be one of `sv-SE`, `en-EN` or `fr-FR`
 
 - **show_time** (*Optional*): Render the time beside the name of the card, default `false`
 
-- **hide_events** (*Optional*): Hide all events and renders just the headers, default `false`
+- **hide_empty** (*Optional*): Hide traffic types with empty events, default `false`
 
-- **show_only_disturbances** (*Optional*): Renders just disturbances in the traffic, default `false`
+- **filters** (*Optional*): List of text filters for traffic_type (in configured language) and messages
