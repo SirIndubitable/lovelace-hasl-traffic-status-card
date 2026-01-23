@@ -435,7 +435,7 @@ class HASLTrafficStatusCard extends HTMLElement {
 
       if (line.transport_mode == 'BUS') {
         // All blue buses that aren't sin have 3 digit line numbers with the middle digit being a 7
-        if (line.id.length == 3 && (line.id / 10) % 10 == 7 ) {
+        if (line.id.length == 3 && Math.floor(line.id / 10) % 10 == 7 ) {
           // Blåbusslinje
           return " bus_blue";
         }
