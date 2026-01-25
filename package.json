@@ -7,7 +7,8 @@
   "targets": {
     "module": {
       "includeNodeModules": true,
-      "optimize": true
+      "optimize": false,
+      "sourceMap": false
     }
   },
   "scripts": {
@@ -31,12 +32,13 @@
   "homepage": "https://github.com/SirIndubitable/lovelace-hasl-traffic-status-card#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.25.8",
+    "custom-card-helpers": "^1.9.0",
     "jest": "^29.7.0",
     "parcel": "^2.12.0",
     "standard": "^17.1.2"
   },
   "dependencies": {
-    "luxon": "^3.5.0"
+    "lit": "^3.3.2"
   },
   "babel": {
     "presets": [
